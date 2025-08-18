@@ -46,7 +46,7 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
     responseTransform,
   } = params;
 
-  // Convert inputConfig to AppBlock config format
+  // Convert inputConfig to AppBlock input config format
   const blockConfig: Record<string, any> = {};
   Object.entries(inputConfig).forEach(([key, config]) => {
     blockConfig[key] = {
@@ -63,12 +63,12 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
     name,
     description,
     category,
-    config: blockConfig,
 
     inputs: {
       default: {
         name: `Execute ${name}`,
         description: `Trigger ${description.toLowerCase()}`,
+        config: blockConfig,
         onEvent: async (input) => {
           const apiKey = input.app.config.apiKey as string;
           const appKey = input.app.config.appKey as string;
@@ -79,7 +79,7 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
 
           // Replace path parameters
           pathParams.forEach((param) => {
-            const value = input.block.config[param];
+            const value = input.event.inputConfig[param];
             if (value !== undefined) {
               url = url.replace(`{${param}}`, value.toString());
             }
@@ -89,7 +89,7 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
           const searchParams = new URLSearchParams();
           if (method === "GET") {
             Object.entries(inputConfig).forEach(([key, config]) => {
-              const value = input.block.config[key];
+              const value = input.event.inputConfig[key];
               if (
                 value !== undefined &&
                 value !== null &&
@@ -118,7 +118,7 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
           if (method === "POST" || method === "PUT") {
             const bodyParams: any = {};
             Object.entries(inputConfig).forEach(([key, config]) => {
-              const value = input.block.config[key];
+              const value = input.event.inputConfig[key];
               if (
                 value !== undefined &&
                 value !== null &&
