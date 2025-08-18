@@ -4,7 +4,7 @@ import { monitorId } from "../shared";
 export const unmuteMonitorV1 = defineDatadogBlock({
   name: "Unmute Monitor V1",
   description: "Unmute a DataDog monitor using the V1 API",
-  category: "DataDog Monitors",
+  category: "Monitors",
   method: "POST",
   endpoint: "/api/v1/monitor/{monitor_id}/unmute",
   pathParams: ["monitor_id"],

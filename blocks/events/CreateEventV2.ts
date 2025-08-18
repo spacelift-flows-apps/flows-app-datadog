@@ -16,7 +16,7 @@ import { eventSchema } from "../../schemas/event";
 export const createEventV2 = defineDatadogBlock({
   name: "Create Event V2",
   description: "Create a new event in DataDog using the V2 API",
-  category: "DataDog Events",
+  category: "Events",
   method: "POST",
   endpoint: "/api/v2/events",
   useAppKey: false,

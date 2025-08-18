@@ -6,7 +6,7 @@ import { deletedMonitorSchema } from "../../schemas/monitor";
 export const deleteMonitorV1 = defineDatadogBlock({
   name: "Delete Monitor V1",
   description: "Delete a DataDog monitor using the V1 API",
-  category: "DataDog Monitors",
+  category: "Monitors",
   method: "DELETE",
   endpoint: "/api/v1/monitor/{monitor_id}",
   pathParams: ["monitor_id"],

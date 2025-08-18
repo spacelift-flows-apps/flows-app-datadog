@@ -6,7 +6,7 @@ import { monitorListSchema } from "../../schemas/monitor";
 export const listMonitorsV1 = defineDatadogBlock({
   name: "List Monitors V1",
   description: "Get all monitor details from DataDog using the V1 API",
-  category: "DataDog Monitors",
+  category: "Monitors",
   method: "GET",
   endpoint: "/api/v1/monitor",
   outputJsonSchema: monitorListSchema,

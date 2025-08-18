@@ -13,7 +13,7 @@ import { monitorSchema } from "../../schemas/monitor";
 export const createMonitorV1 = defineDatadogBlock({
   name: "Create Monitor V1",
   description: "Create a new DataDog monitor using the V1 API",
-  category: "DataDog Monitors",
+  category: "Monitors",
   method: "POST",
   endpoint: "/api/v1/monitor",
   outputJsonSchema: monitorSchema,

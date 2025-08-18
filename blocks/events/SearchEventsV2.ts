@@ -5,7 +5,7 @@ import { eventListSchema } from "../../schemas/event";
 export const searchEventsV2 = defineDatadogBlock({
   name: "Search Events V2",
   description: "Search for events in DataDog using the V2 API",
-  category: "DataDog Events",
+  category: "Events",
   method: "POST",
   endpoint: "/api/v2/events/search",
   outputJsonSchema: eventListSchema,
