@@ -1,0 +1,47 @@
+{
+  "name": "@spacelift/datadog-api-flow-generator",
+  "version": "1.0.0",
+  "description": "Generate DataDog API flow blocks from OpenAPI schema",
+  "type": "module",
+  "main": "dist/generator.js",
+  "bin": {
+    "datadog-flow-generator": "dist/generator.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate": "node dist/generator.js",
+    "generate:monitors": "node dist/generator.js --resources monitors",
+    "generate:events": "node dist/generator.js --resources events",
+    "generate:all": "node dist/generator.js",
+    "clean": "rm -rf dist",
+    "test": "echo \"Tests not implemented yet\" && exit 0"
+  },
+  "keywords": [
+    "datadog",
+    "api",
+    "openapi",
+    "flow",
+    "generator",
+    "blocks",
+    "spacelift"
+  ],
+  "author": "Spacelift",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
