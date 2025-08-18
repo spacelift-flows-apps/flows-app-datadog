@@ -4,6 +4,8 @@ import { updateMonitorV1 } from "./monitors/UpdateMonitorV1";
 import { deleteMonitorV1 } from "./monitors/DeleteMonitorV1";
 import { getMonitorV1 } from "./monitors/GetMonitorV1";
 import { listMonitorsV1 } from "./monitors/ListMonitorsV1";
+import { muteMonitorV1 } from "./monitors/MuteMonitorV1";
+import { unmuteMonitorV1 } from "./monitors/UnmuteMonitorV1";
 import { createEventV2 } from "./events/CreateEventV2";
 import { getEventV2 } from "./events/GetEventV2";
 import { listEventsV2 } from "./events/ListEventsV2";
@@ -16,6 +18,8 @@ export {
   deleteMonitorV1,
   getMonitorV1,
   listMonitorsV1,
+  muteMonitorV1,
+  unmuteMonitorV1,
 };
 export { createEventV2, getEventV2, listEventsV2, searchEventsV2 };
 
@@ -27,6 +31,8 @@ export const blocks = {
   deleteMonitorV1,
   getMonitorV1,
   listMonitorsV1,
+  muteMonitorV1,
+  unmuteMonitorV1,
 
   // Events V2
   createEventV2,
