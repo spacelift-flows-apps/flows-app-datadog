@@ -4,7 +4,7 @@ import { withDowntimes, groupStates } from "./shared";
 import { monitorListSchema } from "../../schemas/monitor";
 
 export const listMonitorsV1 = defineDatadogBlock({
-  name: "List Monitors V1",
+  name: "List Monitors",
   description: "Get all monitor details from DataDog using the V1 API",
   category: "Monitors",
   method: "GET",

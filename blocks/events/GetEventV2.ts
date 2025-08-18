@@ -3,7 +3,7 @@ import { eventId } from "../shared";
 import { eventSchema } from "../../schemas/event";
 
 export const getEventV2 = defineDatadogBlock({
-  name: "Get Event V2",
+  name: "Get Event",
   description: "Get a specific event from DataDog using the V2 API",
   category: "Events",
   method: "GET",

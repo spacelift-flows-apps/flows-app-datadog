@@ -3,7 +3,7 @@ import { query, fromDate, toDate, sort, pageSize } from "../shared";
 import { eventListSchema } from "../../schemas/event";
 
 export const searchEventsV2 = defineDatadogBlock({
-  name: "Search Events V2",
+  name: "Search Events",
   description: "Search for events in DataDog using the V2 API",
   category: "Events",
   method: "POST",

@@ -11,7 +11,7 @@ import {
 import { monitorSchema } from "../../schemas/monitor";
 
 export const updateMonitorV1 = defineDatadogBlock({
-  name: "Update Monitor V1",
+  name: "Update Monitor",
   description: "Update an existing DataDog monitor using the V1 API",
   category: "Monitors",
   method: "PUT",

@@ -4,7 +4,7 @@ import { forceDelete } from "./shared";
 import { deletedMonitorSchema } from "../../schemas/monitor";
 
 export const deleteMonitorV1 = defineDatadogBlock({
-  name: "Delete Monitor V1",
+  name: "Delete Monitor",
   description: "Delete a DataDog monitor using the V1 API",
   category: "Monitors",
   method: "DELETE",
