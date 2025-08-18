@@ -1,29 +1,30 @@
 import { AppBlock, events } from "@slflows/sdk/v1";
 
-export const GetEventV1: AppBlock = {
-  name: "Get an event",
-  description: `This endpoint allows you to query for event details.  **Note**: If the event you’re querying contains markdown formatting of any kind, you may see characters such as \`%\`,\`\\\`,\`n\` in your output.`,
-  category: "Event",
+export const GetMonitorConfigPolicyV2: AppBlock = {
+  name: "Get a monitor configuration policy",
+  description: `Get a monitor configuration policy by \`policy_id\`.`,
+  category: "MonitorConfigPolicy",
 
   inputs: {
     default: {
       config: {
-        eventId: {
-          name: "Event Id",
-          description: `Event Id parameter`,
+        policyId: {
+          name: "Policy Id",
+          description: `Policy Id parameter`,
           type: {
-            "type": "number"
+            "type": "string",
+            "example": "00000000-0000-1234-0000-000000000000"
           },
           required: true,
         },
       },
       onEvent: async (input) => {
-        const { eventId } = input.event.inputConfig;
+        const { policyId } = input.event.inputConfig;
         const apiKey = input.app.config.apiKey as string;
         const appKey = input.app.config.appKey as string;
         const baseUrl = input.app.config.baseUrl as string;
 
-        const url = `${baseUrl}/api/v1/events/${eventId}`;
+        const url = `${baseUrl}/api/v2/monitor/policy/${policyId}`;
         
         const response = await fetch(url, {
           method: "GET",
@@ -36,7 +37,7 @@ export const GetEventV1: AppBlock = {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`Failed to get an event: ${response.status} ${response.statusText} - ${errorText}`);
+          throw new Error(`Failed to get a monitor configuration policy: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
         const result = await response.json();
@@ -48,14 +49,13 @@ export const GetEventV1: AppBlock = {
 
   outputs: {
     default: {
-      name: "Event Details",
-      description: `The retrieved event object`,
+      name: "MonitorConfigPolicy Details",
+      description: `The retrieved monitorconfigpolicy object`,
       default: true,
       type: {
         type: "object",
         properties: {
-          event: { type: "string" },
-          status: { type: "string" }
+          data: { type: "string" }
         },
         required: []
       },
