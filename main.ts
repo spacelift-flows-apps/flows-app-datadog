@@ -6,7 +6,7 @@ export const app = defineApp({
   installationInstructions:
     "DataDog API integration for Flows\n\nTo install:\n1. Add your DataDog API key\n2. Add your DataDog Application key\n3. Configure the base URL (defaults to https://api.datadoghq.com)\n4. Start using the blocks in your flows",
 
-  blocks: Object.values(blocks),
+  blocks,
 
   config: {
     apiKey: {
@@ -18,7 +18,8 @@ export const app = defineApp({
     },
     appKey: {
       name: "Application Key",
-      description: "Your DataDog Application key (required for some operations)",
+      description:
+        "Your DataDog Application key (required for some operations)",
       type: "string",
       required: true,
       sensitive: true,
