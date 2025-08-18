@@ -149,6 +149,7 @@ export interface GeneratorOptions {
   methodFilter?: string[];
   tagFilter?: string[];
   operationFilter?: string[];
+  excludePatterns?: string[];
 }
 
 // DataDog-specific types

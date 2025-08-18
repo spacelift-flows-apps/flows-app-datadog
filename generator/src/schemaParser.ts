@@ -50,11 +50,17 @@ export class DataDogSchemaParser {
     resourceFilter?: string[], 
     methodFilter?: string[],
     tagFilter?: string[],
-    operationFilter?: string[]
+    operationFilter?: string[],
+    excludePatterns?: string[]
   ): BlockGenerationConfig[] {
     const configs: BlockGenerationConfig[] = [];
 
     for (const [path, pathItem] of Object.entries(this.schema.paths)) {
+      // Skip if path matches any exclude patterns
+      if (excludePatterns && this.matchesExcludePatterns(path, excludePatterns)) {
+        continue;
+      }
+
       // Skip if resource filter is specified and path doesn't match
       if (resourceFilter && !this.matchesResourceFilter(path, resourceFilter)) {
         continue;
@@ -89,6 +95,19 @@ export class DataDogSchemaParser {
     }
 
     return configs;
+  }
+
+  /**
+   * Check if a path matches any of the exclude patterns
+   */
+  private matchesExcludePatterns(path: string, excludePatterns: string[]): boolean {
+    return excludePatterns.some(pattern => {
+      const normalizedPattern = pattern.toLowerCase();
+      const normalizedPath = path.toLowerCase();
+      
+      // Check if path contains the exclude pattern
+      return normalizedPath.includes(normalizedPattern);
+    });
   }
 
   /**

@@ -2,13 +2,10 @@
  * Generated Block Registry for DataDog API
  * 
  * This file is auto-generated. Do not edit manually.
- * Generated on: 2025-08-18T12:30:04.582Z
- * Total blocks: 48
+ * Generated on: 2025-08-18T13:20:13.918Z
+ * Total blocks: 45
  */
 
-import { ListEventsV1 } from './ListEventsV1.js';
-import { CreateEventV1 } from './CreateEventV1.js';
-import { GetEventV1 } from './GetEventV1.js';
 import { ListMonitorsV1 } from './ListMonitorsV1.js';
 import { CreateMonitorV1 } from './CreateMonitorV1.js';
 import { CheckCanDeleteMonitorV1 } from './CheckCanDeleteMonitorV1.js';
@@ -59,9 +56,6 @@ import { ListSpansV2 } from './ListSpansV2.js';
  * Dictionary of all available blocks
  */
 export const blocks = {
-  ListEventsV1: ListEventsV1,
-  CreateEventV1: CreateEventV1,
-  GetEventV1: GetEventV1,
   ListMonitorsV1: ListMonitorsV1,
   CreateMonitorV1: CreateMonitorV1,
   CheckCanDeleteMonitorV1: CheckCanDeleteMonitorV1,
@@ -110,4 +104,4 @@ export const blocks = {
 } as const;
 
 // Named exports for individual blocks
-export { ListEventsV1, CreateEventV1, GetEventV1, ListMonitorsV1, CreateMonitorV1, CheckCanDeleteMonitorV1, SearchMonitorGroupsV1, SearchMonitorsV1, ValidateMonitorV1, GetMonitorV1, UpdateMonitorV1, DeleteMonitorV1, ListMonitorDowntimesV1, ValidateExistingMonitorV1, ListAuditLogsV2, SearchAuditLogsV2, ListCIAppPipelineEventsV2, SearchCIAppPipelineEventsV2, ListCIAppTestEventsV2, SearchCIAppTestEventsV2, ListEventsV2, CreateEventV2, SearchEventsV2, GetEventV2, ListLogsGetV2, ListLogsV2, GetMonitorNotificationRulesV2, CreateMonitorNotificationRuleV2, GetMonitorNotificationRuleV2, DeleteMonitorNotificationRuleV2, UpdateMonitorNotificationRuleV2, ListMonitorConfigPoliciesV2, CreateMonitorConfigPolicyV2, GetMonitorConfigPolicyV2, DeleteMonitorConfigPolicyV2, UpdateMonitorConfigPolicyV2, ListMonitorUserTemplatesV2, CreateMonitorUserTemplateV2, ValidateMonitorUserTemplateV2, GetMonitorUserTemplateV2, UpdateMonitorUserTemplateV2, DeleteMonitorUserTemplateV2, ValidateExistingMonitorUserTemplateV2, ListMonitorDowntimesV2, ListRUMEventsV2, SearchRUMEventsV2, ListSpansGetV2, ListSpansV2 };
+export { ListMonitorsV1, CreateMonitorV1, CheckCanDeleteMonitorV1, SearchMonitorGroupsV1, SearchMonitorsV1, ValidateMonitorV1, GetMonitorV1, UpdateMonitorV1, DeleteMonitorV1, ListMonitorDowntimesV1, ValidateExistingMonitorV1, ListAuditLogsV2, SearchAuditLogsV2, ListCIAppPipelineEventsV2, SearchCIAppPipelineEventsV2, ListCIAppTestEventsV2, SearchCIAppTestEventsV2, ListEventsV2, CreateEventV2, SearchEventsV2, GetEventV2, ListLogsGetV2, ListLogsV2, GetMonitorNotificationRulesV2, CreateMonitorNotificationRuleV2, GetMonitorNotificationRuleV2, DeleteMonitorNotificationRuleV2, UpdateMonitorNotificationRuleV2, ListMonitorConfigPoliciesV2, CreateMonitorConfigPolicyV2, GetMonitorConfigPolicyV2, DeleteMonitorConfigPolicyV2, UpdateMonitorConfigPolicyV2, ListMonitorUserTemplatesV2, CreateMonitorUserTemplateV2, ValidateMonitorUserTemplateV2, GetMonitorUserTemplateV2, UpdateMonitorUserTemplateV2, DeleteMonitorUserTemplateV2, ValidateExistingMonitorUserTemplateV2, ListMonitorDowntimesV2, ListRUMEventsV2, SearchRUMEventsV2, ListSpansGetV2, ListSpansV2 };

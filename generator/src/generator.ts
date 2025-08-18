@@ -102,7 +102,8 @@ class DataDogFlowGenerator {
       options.resourceFilter,
       options.methodFilter,
       options.tagFilter,
-      options.operationFilter
+      options.operationFilter,
+      options.excludePatterns
     );
 
     console.log(`✅ Found ${configs.length} operations in ${version} schema`);
@@ -166,7 +167,17 @@ class DataDogFlowGenerator {
       return {
         ...options,
         // Filter for paths that contain monitor or event endpoints
-        resourceFilter: ['monitor', 'events']
+        resourceFilter: ['monitor', 'events'],
+        // Default exclude pattern for /api/v1/event paths
+        excludePatterns: options.excludePatterns || ['/api/v1/event']
+      };
+    }
+    
+    // Always apply default exclude patterns if none specified
+    if (!options.excludePatterns) {
+      return {
+        ...options,
+        excludePatterns: ['/api/v1/event']
       };
     }
     
@@ -363,6 +374,10 @@ async function main() {
       case '--operations':
         options.operationFilter = args[++i].split(',').map(s => s.trim());
         break;
+      case '--exclude':
+      case '-x':
+        options.excludePatterns = args[++i].split(',').map(s => s.trim());
+        break;
       case '--help':
       case '-h':
         console.log(`
@@ -378,6 +393,7 @@ Options:
   -m, --methods <list>         Comma-separated HTTP methods (e.g., GET,POST,PUT)
   -t, --tags <list>           Comma-separated tag filter (e.g., "Monitors","Events")
   --operations <list>          Comma-separated operationId filter
+  -x, --exclude <list>         Comma-separated path exclude patterns (e.g., "/api/v1/event")
   -h, --help                   Show this help
 
 Examples:
@@ -389,6 +405,9 @@ Examples:
 
   # Generate blocks for specific tags
   node generator.js --tags "Monitors","Events" --output ./generated-blocks
+
+  # Exclude specific path patterns
+  node generator.js --resources monitors,events --exclude "/api/v1/event,/api/v1/user"
 
   # Use local schema file
   node generator.js --schema-file ./openapi.yaml --resources monitors --output ./blocks

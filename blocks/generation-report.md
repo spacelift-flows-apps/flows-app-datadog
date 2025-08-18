@@ -1,18 +1,9 @@
 # DataDog API Block Generation Report
 
-Generated on: 2025-08-18T12:30:04.582Z
-Total blocks: 48
+Generated on: 2025-08-18T13:20:13.918Z
+Total blocks: 45
 
 ## Summary by Category
-
-### Event (7 blocks)
-- ListEventsV1 (GET /api/v1/events)
-- CreateEventV1 (POST /api/v1/events)
-- GetEventV1 (GET /api/v1/events/{event_id})
-- ListEventsV2 (GET /api/v2/events)
-- CreateEventV2 (POST /api/v2/events)
-- SearchEventsV2 (POST /api/v2/events/search)
-- GetEventV2 (GET /api/v2/events/{event_id})
 
 ### Monitor (11 blocks)
 - ListMonitorsV1 (GET /api/v1/monitor)
@@ -45,6 +36,12 @@ Total blocks: 48
 ### CIAppTestEvents (2 blocks)
 - ListCIAppTestEventsV2 (GET /api/v2/ci/tests/events)
 - SearchCIAppTestEventsV2 (POST /api/v2/ci/tests/events/search)
+
+### Event (4 blocks)
+- ListEventsV2 (GET /api/v2/events)
+- CreateEventV2 (POST /api/v2/events)
+- SearchEventsV2 (POST /api/v2/events/search)
+- GetEventV2 (GET /api/v2/events/{event_id})
 
 ### LogsGet (1 blocks)
 - ListLogsGetV2 (GET /api/v2/logs/events)
@@ -91,9 +88,7 @@ Total blocks: 48
 
 ## Summary by HTTP Method
 
-### GET (23 blocks)
-- ListEventsV1
-- GetEventV1
+### GET (21 blocks)
 - ListMonitorsV1
 - CheckCanDeleteMonitorV1
 - SearchMonitorGroupsV1
@@ -116,8 +111,7 @@ Total blocks: 48
 - ListRUMEventsV2
 - ListSpansGetV2
 
-### POST (17 blocks)
-- CreateEventV1
+### POST (16 blocks)
 - CreateMonitorV1
 - ValidateMonitorV1
 - ValidateExistingMonitorV1
@@ -151,9 +145,6 @@ Total blocks: 48
 
 ## All Generated Blocks
 
-- **ListEventsV1** (`GET /api/v1/events`) - Event
-- **CreateEventV1** (`POST /api/v1/events`) - Event
-- **GetEventV1** (`GET /api/v1/events/{event_id}`) - Event
 - **ListMonitorsV1** (`GET /api/v1/monitor`) - Monitor
 - **CreateMonitorV1** (`POST /api/v1/monitor`) - Monitor
 - **CheckCanDeleteMonitorV1** (`GET /api/v1/monitor/can_delete`) - Monitor
