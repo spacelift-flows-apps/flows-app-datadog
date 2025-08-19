@@ -7,6 +7,7 @@ A Flows app that provides integration with DataDog's monitoring and events APIs,
 This app provides blocks for:
 
 ### Monitor Management
+
 - **Create Monitor** - Create new monitors in DataDog
 - **Get Monitor** - Retrieve monitor details by ID
 - **Update Monitor** - Modify existing monitors
@@ -16,6 +17,7 @@ This app provides blocks for:
 - **Unmute Monitor** - Restore monitor notifications
 
 ### Event Management
+
 - **Create Event** - Create custom events in DataDog
 - **Get Event** - Retrieve event details by ID
 - **List Events** - Query events with filters and pagination
@@ -44,9 +46,11 @@ This app provides blocks for:
 ## Block Categories
 
 ### Monitors
+
 All monitor-related operations for creating, managing, and controlling DataDog monitors.
 
 ### Events
+
 Event creation and querying capabilities for DataDog's events system.
 
 ## Architecture
@@ -83,6 +87,7 @@ Common input types are defined once and reused across blocks:
 ### Type Safety
 
 All blocks include comprehensive TypeScript types and JSON schemas for:
+
 - Input validation
 - Output type safety
 - Runtime error handling
@@ -157,6 +162,7 @@ export const blocks = {
 ### Block Implementation Pattern
 
 The `defineDatadogBlock` utility handles:
+
 - HTTP request construction
 - Authentication headers (DD-API-KEY, DD-APPLICATION-KEY)
 - Path parameter substitution
@@ -168,6 +174,7 @@ The `defineDatadogBlock` utility handles:
 ## API Coverage
 
 ### Monitor API (V1)
+
 - `POST /api/v1/monitor` - Create monitor
 - `GET /api/v1/monitor/{id}` - Get monitor
 - `PUT /api/v1/monitor/{id}` - Update monitor
@@ -177,6 +184,7 @@ The `defineDatadogBlock` utility handles:
 - `POST /api/v1/monitor/{id}/unmute` - Unmute monitor
 
 ### Events API (V2)
+
 - `POST /api/v2/events` - Create event
 - `GET /api/v2/events/{id}` - Get event
 - `GET /api/v2/events` - List events
@@ -192,6 +200,7 @@ The `defineDatadogBlock` utility handles:
 ## Support
 
 For issues or feature requests, please check the DataDog API documentation:
+
 - [DataDog API Reference](https://docs.datadoghq.com/api/)
 - [Monitor API](https://docs.datadoghq.com/api/latest/monitors/)
 - [Events API](https://docs.datadoghq.com/api/latest/events/)
