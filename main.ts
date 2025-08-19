@@ -289,8 +289,6 @@ export const app = defineApp({
         const matchingEntityIds = entityList.blocks
           .filter((entity) => {
             const monitorId = alertData.monitorId as string;
-            // const monitorName = alertData.monitorName as string;
-            console.log(monitorId, entity.config.monitor_id);
 
             // Check if the entity is subscribed to this monitor by ID
             if (monitorId && entity.config.monitor_id) {
@@ -342,10 +340,7 @@ function extractMonitorInfo(
       ? payload.tags.split(",").map((t: string) => t.trim())
       : [];
 
-  let timestamp;
-  if (payload.timestamp) {
-    timestamp = new Date(payload.timestamp as string).toISOString();
-  }
+  const timestamp = new Date(Number(payload.timestamp)).toISOString();
 
   // Extract monitor ID and URLs
   const monitorId = payload.monitor_id || "";
