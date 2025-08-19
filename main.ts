@@ -1,4 +1,11 @@
-import {AppInput, http, defineApp, blocks, messaging, kv} from "@slflows/sdk/v1";
+import {
+  AppInput,
+  http,
+  defineApp,
+  blocks,
+  messaging,
+  kv,
+} from "@slflows/sdk/v1";
 import { blocks as allBlocks } from "./blocks/index";
 
 export const app = defineApp({
@@ -6,7 +13,7 @@ export const app = defineApp({
   installationInstructions:
     "DataDog API integration for Flows\n\nTo install:\n1. Add your DataDog API key\n2. Add your DataDog Application key\n3. Configure the base URL (defaults to https://api.datadoghq.com)\n4. Start using the blocks in your flows",
 
-  blocks:allBlocks,
+  blocks: allBlocks,
 
   config: {
     apiKey: {
@@ -33,7 +40,7 @@ export const app = defineApp({
     },
   },
 
-  async onSync(input:AppInput) {
+  async onSync(input: AppInput) {
     const apiKey = input.app.config.apiKey as string;
     const appKey = input.app.config.appKey as string;
     const baseUrl = input.app.config.baseUrl as string;
@@ -72,7 +79,7 @@ export const app = defineApp({
 
       // Check if webhook already exists
       const existingWebhookName = await kv.app.get("webhook_name");
-      
+
       if (existingWebhookName?.value) {
         console.log(`Webhook already exists: ${existingWebhookName.value}`);
         return {
@@ -88,16 +95,18 @@ export const app = defineApp({
       const webhookName = `spacelift-flows-${crypto.randomUUID()}`;
 
       try {
-        const webhookResponse = await fetch(`${baseUrl}/api/v1/integration/webhooks/configuration/webhooks`, {
-          method: "POST",
-          headers: {
-            "DD-API-KEY": apiKey,
-            "DD-APPLICATION-KEY": appKey,
-          },
-          body: JSON.stringify({
-            name: webhookName,
-            url: `${input.app.http.url}/webhook?secret=${webhookSecret}`,
-            payload: `{
+        const webhookResponse = await fetch(
+          `${baseUrl}/api/v1/integration/webhooks/configuration/webhooks`,
+          {
+            method: "POST",
+            headers: {
+              "DD-API-KEY": apiKey,
+              "DD-APPLICATION-KEY": appKey,
+            },
+            body: JSON.stringify({
+              name: webhookName,
+              url: `${input.app.http.url}/webhook?secret=${webhookSecret}`,
+              payload: `{
               "monitor_id": "$ALERT_ID",
               "monitor_name": "$ALERT_TITLE",
               "status": "$ALERT_TRANSITION",
@@ -111,9 +120,10 @@ export const app = defineApp({
               "alert_metric": "$ALERT_METRIC",
               "priority": "$ALERT_PRIORITY",
               "event_type": "$EVENT_TYPE"
-            }`
-          }),
-        });
+            }`,
+            }),
+          },
+        );
 
         if (!webhookResponse.ok) {
           const webhookErrorText = await webhookResponse.text();
@@ -125,8 +135,10 @@ export const app = defineApp({
           };
         } else {
           const webhookResult = await webhookResponse.json();
-          console.log(`Webhook created successfully with ID: ${webhookResult.id || 'unknown'}`);
-          
+          console.log(
+            `Webhook created successfully with ID: ${webhookResult.id || "unknown"}`,
+          );
+
           // Store webhook name in KV for future reference
           await kv.app.set({ key: "webhook_name", value: webhookName });
           console.log(`Stored webhook name: ${webhookName}`);
@@ -153,6 +165,69 @@ export const app = defineApp({
     }
   },
 
+  onDrain: async (input: AppInput) => {
+    const apiKey = input.app.config.apiKey as string;
+    const appKey = input.app.config.appKey as string;
+    const baseUrl = input.app.config.baseUrl as string;
+
+    try {
+      // Get the stored webhook name
+      const webhookNamePair = await kv.app.get("webhook_name");
+      const webhookName = webhookNamePair?.value;
+
+      if (!webhookName) {
+        console.log(
+          "No webhook name found in storage, skipping webhook deletion",
+        );
+        return {
+          newStatus: "drained",
+        };
+      }
+
+      console.log(`Attempting to delete webhook: ${webhookName}`);
+
+      // Delete the webhook directly by name
+      const deleteResponse = await fetch(
+        `${baseUrl}/api/v1/integration/webhooks/configuration/webhooks/${webhookName}`,
+        {
+          method: "DELETE",
+          headers: {
+            "DD-API-KEY": apiKey,
+            "DD-APPLICATION-KEY": appKey,
+          },
+        },
+      );
+
+      if (!deleteResponse.ok) {
+        const errorText = await deleteResponse.text();
+        const errorMsg = `Failed to delete webhook: ${deleteResponse.status} ${deleteResponse.statusText} - ${errorText}`;
+        console.error(errorMsg);
+        return {
+          newStatus: "draining_failed" as const,
+          customStatusDescription: errorMsg,
+        };
+      }
+
+      console.log(`Successfully deleted webhook: ${webhookName}`);
+
+      // Clean up stored webhook data
+      await kv.app.delete(["webhook_name"]);
+      await kv.app.delete(["webhook_secret"]);
+      console.log("Cleaned up stored webhook data");
+    } catch (error) {
+      const errorMsg = `Error during webhook cleanup: ${error instanceof Error ? error.message : String(error)}`;
+      console.error(errorMsg);
+      return {
+        newStatus: "draining_failed" as const,
+        customStatusDescription: errorMsg,
+      };
+    }
+
+    return {
+      newStatus: "drained",
+    };
+  },
+
   http: {
     onRequest: async (input: any) => {
       // Handle DataDog webhook events
@@ -162,16 +237,24 @@ export const app = defineApp({
       const requestedSecret = input.request.query?.secret;
       const storedSecretPair = await kv.app.get("webhook_secret");
       const storedSecret = storedSecretPair?.value;
-      
-      if (!requestedSecret || !storedSecret || requestedSecret !== storedSecret) {
-        console.log("Invalid webhook secret. Requested:", requestedSecret, "Stored:", storedSecret);
+
+      if (
+        !requestedSecret ||
+        !storedSecret ||
+        requestedSecret !== storedSecret
+      ) {
+        console.log(
+          "Invalid webhook secret. Requested:",
+          requestedSecret,
+          "Stored:",
+          storedSecret,
+        );
         await http.respond(input.request.requestId, {
           statusCode: 401,
           body: { error: "Unauthorized: Invalid webhook secret" },
         });
         return;
       }
-
 
       // Optional: Also check if the path is correct (e.g., /webhook)
       if (input.request.path && !input.request.path.includes("/webhook")) {
@@ -193,8 +276,8 @@ export const app = defineApp({
       try {
         // Parse information from the webhook payload
         const alertData = extractMonitorInfo(
-            payload,
-            input.app.config.datadogSite,
+          payload,
+          input.app.config.datadogSite,
         );
         console.log("Extracted alert data:", alertData);
 
@@ -204,23 +287,23 @@ export const app = defineApp({
         });
 
         const matchingEntityIds = entityList.blocks
-            .filter((entity) => {
-              const monitorId = alertData.monitorId as string;
-              // const monitorName = alertData.monitorName as string;
-              console.log(monitorId,entity.config.monitor_id)
+          .filter((entity) => {
+            const monitorId = alertData.monitorId as string;
+            // const monitorName = alertData.monitorName as string;
+            console.log(monitorId, entity.config.monitor_id);
 
-              // Check if the entity is subscribed to this monitor by ID
-              if (monitorId && entity.config.monitor_id) {
-                if (Array.isArray(entity.config.monitor_id)) {
-                  return entity.config.monitor_id.includes(monitorId);
-                } else {
-                  return entity.config.monitor_id === monitorId;
-                }
+            // Check if the entity is subscribed to this monitor by ID
+            if (monitorId && entity.config.monitor_id) {
+              if (Array.isArray(entity.config.monitor_id)) {
+                return entity.config.monitor_id.includes(monitorId);
+              } else {
+                return entity.config.monitor_id === monitorId;
               }
+            }
 
-              return true;
-            })
-            .map((entity) => entity.id);
+            return true;
+          })
+          .map((entity) => entity.id);
 
         // Send internal messages to matching entities
         if (matchingEntityIds.length > 0) {
@@ -249,49 +332,23 @@ export const app = defineApp({
   },
 });
 
-
 function extractMonitorInfo(
-    payload: Record<string, unknown>,
-    datadogSite: string = "us",
+  payload: Record<string, unknown>,
+  datadogSite: string = "us",
 ): Record<string, unknown> {
   const tags = Array.isArray(payload.tags)
-      ? payload.tags
-      : typeof payload.tags === "string"
-          ? payload.tags.split(",").map((t: string) => t.trim())
-          : [];
+    ? payload.tags
+    : typeof payload.tags === "string"
+      ? payload.tags.split(",").map((t: string) => t.trim())
+      : [];
 
-  // Parse timestamp - handle both string format and numeric timestamp
-  let timestamp: string;
+  let timestamp;
   if (payload.timestamp) {
-    if (typeof payload.timestamp === "number") {
-      timestamp = new Date(payload.timestamp).toISOString();
-    } else if (typeof payload.timestamp === "string") {
-      // Try parsing as number first, then as date string
-      const parsedNum = parseInt(payload.timestamp);
-      timestamp = !isNaN(parsedNum)
-          ? new Date(parsedNum).toISOString()
-          : new Date(payload.timestamp).toISOString();
-    } else {
-      timestamp = new Date().toISOString();
-    }
-  } else if (payload.date) {
-    if (typeof payload.date === "number") {
-      timestamp = new Date(payload.date).toISOString();
-    } else if (typeof payload.date === "string") {
-      // Try parsing as number first, then as date string
-      const parsedNum = parseInt(payload.date);
-      timestamp = !isNaN(parsedNum)
-          ? new Date(parsedNum).toISOString()
-          : new Date(payload.date).toISOString();
-    } else {
-      timestamp = new Date().toISOString();
-    }
-  } else {
-    timestamp = new Date().toISOString();
+    timestamp = new Date(payload.timestamp as string).toISOString();
   }
 
   // Extract monitor ID and URLs
-  const monitorId = payload.monitor_id || payload.alert_id || payload.id || "";
+  const monitorId = payload.monitor_id || "";
   const monitorUrl = `https://app.datadoghq.${datadogSite}.com/monitors/${monitorId}`;
   const eventUrl = payload.url || payload.link || "";
 
@@ -299,13 +356,13 @@ function extractMonitorInfo(
     // Monitor identification
     monitorId: monitorId,
     monitorName:
-        payload.monitor_name || payload.alert_title || payload.title || "",
+      payload.monitor_name || payload.alert_title || payload.title || "",
 
     // Alert state (keep status for backward compatibility)
     status:
-        payload.status || payload.alert_transition || payload.alert_type || "",
+      payload.status || payload.alert_transition || payload.alert_type || "",
     transitionType:
-        payload.status || payload.alert_transition || payload.alert_type || "",
+      payload.status || payload.alert_transition || payload.alert_type || "",
 
     // Alert details
     alertCondition: payload.alert_status || payload.previous_status || "",
