@@ -17,7 +17,10 @@ export const subscribeToMonitorV1: AppBlock = {
   async onInternalMessage({ message }) {
     const monitorPayload = message.body;
 
-    await events.emit(monitorPayload);
+    // Extract the actual webhook data from the message
+    if (monitorPayload.type === "monitor_status_change") {
+      await events.emit(monitorPayload.data);
+    }
   },
 
   outputs: {
@@ -28,24 +31,60 @@ export const subscribeToMonitorV1: AppBlock = {
       type: {
         type: "object",
         properties: {
-          id: { type: "string" },
-          event_type: { type: "string" },
-          title: { type: "string" },
-          text: { type: "string" },
-          date: { type: "number" },
-          priority: { type: "string" },
-          tags: {
-            type: "array",
-            items: { type: "string" },
+          monitor_id: {
+            type: "string",
+            description: "DataDog monitor ID",
           },
-          alert_id: { type: "string" },
-          alert_title: { type: "string" },
-          alert_status: { type: "string" },
-          alert_transition: { type: "string" },
-          hostname: { type: "string" },
-          org_name: { type: "string" },
-          monitor_id: { type: "number" },
+          monitor_name: {
+            type: "string",
+            description: "Name of the monitor",
+          },
+          status: {
+            type: "string",
+            description: "Current status (e.g., 'Triggered', 'Recovered')",
+          },
+          alert_status: {
+            type: "string",
+            description: "Detailed alert status description",
+          },
+          message: {
+            type: "string",
+            description: "Full notification message with details and links",
+          },
+          timestamp: {
+            type: "string",
+            description: "Timestamp in milliseconds since epoch",
+          },
+          url: {
+            type: "string",
+            description: "Event URL for this alert",
+          },
+          tags: {
+            type: "string",
+            description: "Comma-separated tags",
+          },
+          alert_query: {
+            type: "string",
+            description: "The monitor query that triggered this alert",
+          },
+          alert_scope: {
+            type: "string",
+            description: "Scope of the alert",
+          },
+          alert_metric: {
+            type: "string",
+            description: "Metric name being monitored",
+          },
+          priority: {
+            type: "string",
+            description: "Alert priority level",
+          },
+          event_type: {
+            type: "string",
+            description: "Type of monitor event (e.g., 'query_alert_monitor')",
+          },
         },
+        required: ["monitor_id", "monitor_name", "status", "timestamp"],
       },
     },
   },

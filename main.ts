@@ -274,12 +274,7 @@ export const app = defineApp({
       const payload = input.request.body;
 
       try {
-        // Parse information from the webhook payload
-        const alertData = extractMonitorInfo(
-          payload,
-          input.app.config.datadogSite,
-        );
-        console.log("Extracted alert data:", alertData);
+        console.log("Extracted alert data:", payload);
 
         // Find entities that are subscribed to this monitor
         const entityList = await blocks.list({
@@ -288,7 +283,7 @@ export const app = defineApp({
 
         const matchingEntityIds = entityList.blocks
           .filter((entity) => {
-            const monitorId = alertData.monitorId as string;
+            const monitorId = payload.monitor_id as string;
 
             // Check if the entity is subscribed to this monitor by ID
             if (monitorId && entity.config.monitor_id) {
@@ -309,7 +304,7 @@ export const app = defineApp({
             blockIds: matchingEntityIds,
             body: {
               type: "monitor_status_change",
-              data: alertData,
+              data: payload,
             },
           });
         }
@@ -329,57 +324,3 @@ export const app = defineApp({
     },
   },
 });
-
-function extractMonitorInfo(
-  payload: Record<string, unknown>,
-  datadogSite: string = "us",
-): Record<string, unknown> {
-  const tags = Array.isArray(payload.tags)
-    ? payload.tags
-    : typeof payload.tags === "string"
-      ? payload.tags.split(",").map((t: string) => t.trim())
-      : [];
-
-  const timestamp = new Date(Number(payload.timestamp)).toISOString();
-
-  // Extract monitor ID and URLs
-  const monitorId = payload.monitor_id || "";
-  const monitorUrl = `https://app.datadoghq.${datadogSite}.com/monitors/${monitorId}`;
-  const eventUrl = payload.url || payload.link || "";
-
-  return {
-    // Monitor identification
-    monitorId: monitorId,
-    monitorName:
-      payload.monitor_name || payload.alert_title || payload.title || "",
-
-    // Alert state (keep status for backward compatibility)
-    status:
-      payload.status || payload.alert_transition || payload.alert_type || "",
-    transitionType:
-      payload.status || payload.alert_transition || payload.alert_type || "",
-
-    // Alert details
-    alertCondition: payload.alert_status || payload.previous_status || "",
-    message: payload.message || payload.text_only_msg || payload.body || "",
-
-    // Query information
-    query: payload.alert_query || "",
-    metric: payload.alert_metric || "",
-    scope: payload.alert_scope || "",
-
-    // Metadata
-    timestamp: timestamp,
-    priority: payload.priority || payload.alert_priority || "",
-    tags: tags,
-    eventType: payload.event_type || "monitor_alert",
-
-    // URLs
-    url: eventUrl, // Keep for backward compatibility
-    monitorUrl: monitorUrl,
-    eventUrl: eventUrl,
-
-    // Original payload for debugging
-    rawPayload: payload,
-  };
-}
