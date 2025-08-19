@@ -199,16 +199,23 @@ export const app = defineApp({
       );
 
       if (!deleteResponse.ok) {
-        const errorText = await deleteResponse.text();
-        const errorMsg = `Failed to delete webhook: ${deleteResponse.status} ${deleteResponse.statusText} - ${errorText}`;
-        console.error(errorMsg);
-        return {
-          newStatus: "draining_failed" as const,
-          customStatusDescription: errorMsg,
-        };
+        // Treat 404 as success since webhook doesn't exist (desired end state)
+        if (deleteResponse.status === 404) {
+          console.log(
+            `Webhook ${webhookName} not found (404) - treating as already deleted`,
+          );
+        } else {
+          const errorText = await deleteResponse.text();
+          const errorMsg = `Failed to delete webhook: ${deleteResponse.status} ${deleteResponse.statusText} - ${errorText}`;
+          console.error(errorMsg);
+          return {
+            newStatus: "draining_failed" as const,
+            customStatusDescription: errorMsg,
+          };
+        }
+      } else {
+        console.log(`Successfully deleted webhook: ${webhookName}`);
       }
-
-      console.log(`Successfully deleted webhook: ${webhookName}`);
 
       // Clean up stored webhook data
       await kv.app.delete(["webhook_name"]);
@@ -325,12 +332,11 @@ export const app = defineApp({
   },
 });
 
-
 function generateWebhookSecret(): string {
   // Generate 32 random bytes and convert to hex string
   const randomBytes = new Uint8Array(32);
   crypto.getRandomValues(randomBytes);
   return Array.from(randomBytes, (byte) =>
-      byte.toString(16).padStart(2, "0"),
+    byte.toString(16).padStart(2, "0"),
   ).join("");
 }
