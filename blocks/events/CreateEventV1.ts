@@ -13,12 +13,12 @@ import {
 import { tags } from "../shared";
 import { eventSchema } from "../../schemas/event";
 
-export const createEventV2 = defineDatadogBlock({
+export const createEventV1 = defineDatadogBlock({
   name: "Create Event",
-  description: "Create a new event in DataDog using the V2 API",
+  description: "Create a new event in DataDog using the V1 API",
   category: "Events",
   method: "POST",
-  endpoint: "/api/v2/events",
+  endpoint: "/api/v1/events",
   useAppKey: false,
   outputJsonSchema: eventSchema,
   inputConfig: {
@@ -34,12 +34,7 @@ export const createEventV2 = defineDatadogBlock({
     related_event_id: relatedEventId,
   },
   requestBodyTransform: (params) => ({
-    data: {
-      type: "events",
-      attributes: {
-        ...params,
-        date_happened: Math.floor(Date.now() / 1000),
-      },
-    },
+    ...params,
+    date_happened: Math.floor(Date.now() / 1000),
   }),
 });

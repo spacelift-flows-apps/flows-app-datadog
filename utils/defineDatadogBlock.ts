@@ -150,6 +150,7 @@ export function defineDatadogBlock(params: DatadogBlockParams): AppBlock {
             headers["Content-Type"] = "application/json";
           }
 
+          console.log(requestBody);
           // Make the request
           const response = await fetch(url, {
             method,

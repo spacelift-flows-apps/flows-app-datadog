@@ -6,7 +6,7 @@ import { getMonitorV1 } from "./monitors/GetMonitorV1";
 import { listMonitorsV1 } from "./monitors/ListMonitorsV1";
 import { muteMonitorV1 } from "./monitors/MuteMonitorV1";
 import { unmuteMonitorV1 } from "./monitors/UnmuteMonitorV1";
-import { createEventV2 } from "./events/CreateEventV2";
+import { createEventV1 } from "./events/CreateEventV1.ts";
 import { getEventV2 } from "./events/GetEventV2";
 import { listEventsV2 } from "./events/ListEventsV2";
 import { searchEventsV2 } from "./events/SearchEventsV2";
@@ -21,7 +21,7 @@ export {
   muteMonitorV1,
   unmuteMonitorV1,
 };
-export { createEventV2, getEventV2, listEventsV2, searchEventsV2 };
+export { createEventV1, getEventV2, listEventsV2, searchEventsV2 };
 
 // Export all blocks as a dictionary
 export const blocks = {
@@ -35,7 +35,7 @@ export const blocks = {
   unmuteMonitorV1,
 
   // Events V2
-  createEventV2,
+  createEventV2: createEventV1,
   getEventV2,
   listEventsV2,
   searchEventsV2,
