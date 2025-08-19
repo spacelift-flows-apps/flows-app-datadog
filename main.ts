@@ -32,4 +32,54 @@ export const app = defineApp({
       default: "https://api.datadoghq.com",
     },
   },
+
+  async onSync(input) {
+    const apiKey = input.app.config.apiKey as string;
+    const appKey = input.app.config.appKey as string;
+    const baseUrl = input.app.config.baseUrl as string;
+
+    try {
+      // Validate API credentials using DataDog's validate endpoint
+      const response = await fetch(`${baseUrl}/api/v1/validate`, {
+        method: "GET",
+        headers: {
+          "DD-API-KEY": apiKey,
+          "DD-APPLICATION-KEY": appKey,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        const errorMsg = `DataDog API validation failed: ${response.status} ${response.statusText} - ${errorText}`;
+        console.error(errorMsg);
+        return {
+          newStatus: "failed" as const,
+          customStatusDescription: "DataDog API validation failed",
+        };
+      }
+
+      const result = await response.json();
+
+      // Check if the validation response indicates valid credentials
+      if (!result.valid) {
+        const errorMsg = "DataDog API credentials are invalid";
+        console.error(errorMsg);
+        return {
+          newStatus: "failed" as const,
+          customStatusDescription: errorMsg,
+        };
+      }
+
+      return {
+        newStatus: "ready" as const,
+      };
+    } catch (error) {
+      const errorMsg = `Failed to validate DataDog API credentials: ${error instanceof Error ? error.message : String(error)}`;
+      console.error(errorMsg);
+      return {
+        newStatus: "failed" as const,
+        customStatusDescription: "Failed to validate DataDog API credentials",
+      };
+    }
+  },
 });
