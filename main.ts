@@ -88,7 +88,7 @@ export const app = defineApp({
       }
 
       // Generate and store webhook secret
-      const webhookSecret = crypto.randomUUID();
+      const webhookSecret = generateWebhookSecret();
       await kv.app.set({ key: "webhook_secret", value: webhookSecret });
 
       // Generate unique webhook name
@@ -324,3 +324,13 @@ export const app = defineApp({
     },
   },
 });
+
+
+function generateWebhookSecret(): string {
+  // Generate 32 random bytes and convert to hex string
+  const randomBytes = new Uint8Array(32);
+  crypto.getRandomValues(randomBytes);
+  return Array.from(randomBytes, (byte) =>
+      byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
