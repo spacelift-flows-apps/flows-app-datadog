@@ -69,6 +69,7 @@ This app automatically sets up webhook integration with DataDog for real-time mo
 ### Subscribe to Monitor Block
 
 The **Subscribe to Monitor** block allows you to listen for real-time monitor alerts.
+
 ## Support
 
 For issues or feature requests, please check the DataDog API documentation:
