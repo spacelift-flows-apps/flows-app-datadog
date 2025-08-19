@@ -1,151 +1,91 @@
-# Flows App Template (Core)
+# DataDog API Flows App
 
-A template repository for creating new core Flows apps with best practices and CI/CD built-in.
+A Flows app that provides integration with DataDog's monitoring and events APIs, allowing you to manage monitors and events directly from your flows.
+
+## Features
+
+This app provides blocks for:
+
+### Monitor Management
+- **Create Monitor** - Create new monitors in DataDog
+- **Get Monitor** - Retrieve monitor details by ID
+- **Update Monitor** - Modify existing monitors
+- **Delete Monitor** - Remove monitors
+- **List Monitors** - Query and list monitors with filters
+- **Mute Monitor** - Temporarily mute monitor notifications
+- **Unmute Monitor** - Restore monitor notifications
+
+### Event Management
+- **Create Event** - Create custom events in DataDog
+- **Get Event** - Retrieve event details by ID
+- **List Events** - Query events with filters and pagination
+- **Search Events** - Advanced event search with complex queries
 
 ## Quick Start
 
-1. **Use this template** - Click "Use this template" button to create a new repository
-2. **Run setup** - `npm run setup` to customize placeholders automatically
-3. **Implement your logic** - Add blocks and customize configuration
-4. **Set up CI/CD** - Configure branch protection and deployment
-5. **Release** - Tag and release your app
+1. **Install the app** in your Flows workspace
+2. **Configure credentials**:
+   - DataDog API Key (required)
+   - DataDog Application Key (required)
+   - Base URL (defaults to https://api.datadoghq.com)
+3. **Add blocks to your flows** and configure inputs
 
-## Template Structure
+## Configuration
 
-```text
-├── .github/workflows/ci.yml  # CI/CD pipeline
-├── .gitignore                # Git ignore rules
-├── package.json              # Dependencies and scripts
-├── tsconfig.json             # TypeScript configuration
-├── main.ts                   # App definition
-├── types.ts                  # Type definitions
-├── blocks/                   # Block implementations
-│   ├── index.ts              # Block registry and exports
-│   └── exampleBlock.ts       # Example block implementation
-├── setup.sh                  # Automated setup script
-└── README.md                 # This file
-```
+### Required Settings
 
-## Customization Guide
+- **API Key**: Your DataDog API key (found in DataDog Organization Settings)
+- **Application Key**: Your DataDog Application key (required for most operations)
 
-### 1. Replace Placeholders
+### Optional Settings
 
-Find and replace these placeholders throughout the codebase:
+- **Base URL**: DataDog API endpoint (default: `https://api.datadoghq.com`)
 
-- `{{APP_NAME}}` - Your app name (e.g., "Slack Integration")
-- `{{APP_DESCRIPTION}}` - Brief description of your app
+## Block Categories
 
-**Files to update:**
+### Monitors
+All monitor-related operations for creating, managing, and controlling DataDog monitors.
 
-- `package.json` - name and description fields
-- `main.ts` - app name and description
-- `types.ts` - JSDoc comments
-- `README.md` - update this file
+### Events
+Event creation and querying capabilities for DataDog's events system.
 
-### 2. Customize Configuration
+## Architecture
 
-In `main.ts`, modify the `config` object:
+### Clean Block Abstraction
+
+This app uses a clean abstraction pattern with the `defineDatadogBlock` utility that eliminates code duplication:
 
 ```typescript
-config: {
-  type: "object",
-  properties: {
-    apiKey: {
-      type: "string",
-      title: "API Key",
-      description: "Your service API key",
-      secret: true  // This makes it a password field
-    },
-    baseUrl: {
-      type: "string",
-      title: "Base URL",
-      description: "API base URL",
-      default: "https://api.example.com"
-    }
+export const createMonitor = defineDatadogBlock({
+  name: "Create Monitor",
+  description: "Create a new DataDog monitor",
+  category: "Monitors",
+  method: "POST",
+  endpoint: "/api/v1/monitor",
+  inputConfig: {
+    name: monitorName,
+    type: monitorType,
+    query: monitorQuery,
+    // ... other inputs
   },
-  required: ["apiKey"]  // Required fields
-}
+  outputJsonSchema: monitorSchema,
+});
 ```
 
-### 3. Implement Your Blocks
+### Shared Input Configurations
 
-The template includes a clean block structure. Blocks are organized in the `blocks/` directory:
+Common input types are defined once and reused across blocks:
 
-#### Adding a New Block
+- **Monitor inputs**: `monitorId`, `monitorName`, `monitorType`, `monitorQuery`
+- **Event inputs**: `eventTitle`, `alertType`, `sourceTypeName`
+- **Common inputs**: `query`, `pageSize`, `fromDate`, `toDate`, `sort`
 
-1. **Create the block file** (e.g., `blocks/myNewBlock.ts`):
+### Type Safety
 
-```typescript
-import { AppBlock, EventInput } from "@slflows/sdk";
-
-export const myNewBlock: AppBlock = {
-  name: "Your Action Name",
-  description: "What your block does",
-  category: "Your Category",
-
-  inputs: {
-    default: {
-      name: "Input Name",
-      description: "What users need to provide",
-      config: {
-        // Define your input schema here
-        type: "object",
-        properties: {
-          message: {
-            type: "string",
-            title: "Message",
-            description: "Input description",
-          },
-        },
-        required: ["message"],
-      },
-      onEvent: async (input: EventInput, { events }) => {
-        // Your logic here
-        const message = input.params.message as string;
-        const apiKey = input.app.config.apiKey as string;
-
-        // Call your external API, process data, etc.
-
-        // Just emit the result directly - don't wrap in success object
-        await events.emit({
-          result: "your result",
-        });
-      },
-    },
-  },
-
-  outputs: {
-    default: {
-      name: "Output Name",
-      description: "What your block returns",
-      default: true,
-      type: {
-        // Define your output schema here
-        type: "object",
-        properties: {
-          result: { type: "string" },
-        },
-        required: ["result"],
-      } as any,
-    },
-  },
-};
-```
-
-2. **Register the block** in `blocks/index.ts`:
-
-```typescript
-import { myNewBlock } from "./myNewBlock.ts";
-
-export const blocks = {
-  example: exampleBlock,
-  myNew: myNewBlock, // Add your block here
-} as const;
-
-export { myNewBlock }; // Export for external use
-```
-
-That's it! The block will automatically be included in your app since `main.ts` uses `blocks` directly as an object.
+All blocks include comprehensive TypeScript types and JSON schemas for:
+- Input validation
+- Output type safety
+- Runtime error handling
 
 ## Development
 
@@ -158,170 +98,100 @@ That's it! The block will automatically be included in your app since `main.ts` 
 
 ```bash
 npm install
-npm run setup        # Interactive setup to customize template
-```
-
-### Available Scripts
-
-```bash
-npm run setup        # Customize template placeholders
 npm run typecheck    # Type checking
 npm run format       # Code formatting
 npm run bundle       # Create deployment bundle
 ```
 
-### Testing Your App
+### Project Structure
 
-1. Run type checking: `npm run typecheck`
-2. Format code: `npm run format`
-3. Create bundle: `npm run bundle`
-
-**Note**: Initial `npm run typecheck` will show SDK import errors until you customize the template. This is expected - the SDK will be available when the app runs in the Flows environment.
-
-## CI/CD Pipeline
-
-The template includes a complete CI/CD pipeline in `.github/workflows/ci.yml`:
-
-### Continuous Integration
-
-- **Triggers**: All branch pushes (except main)
-- **Steps**: Type check, format validation, bundling
-- **Quality Gates**: Must pass all checks to merge
-
-### Automated Releases
-
-- **Triggers**: Semver tags (v1.0.0, v2.1.3, etc.)
-- **Process**:
-  1. Runs full CI validation
-  2. Creates GitHub release with bundle
-  3. Updates version registry (`versions.json`)
-  4. Pushes registry to main branch
-
-### Version Registry
-
-The pipeline automatically maintains a `versions.json` file:
-
-```json
-{
-  "versions": [
-    {
-      "version": "1.0.0",
-      "artifactUrl": "https://github.com/user/repo/releases/download/v1.0.0/bundle.tar.gz",
-      "artifactChecksum": "sha256:abc123..."
-    }
-  ]
-}
+```text
+├── blocks/                     # Block implementations
+│   ├── monitors/              # Monitor-related blocks
+│   ├── events/                # Event-related blocks
+│   ├── shared.ts              # Common input configurations
+│   └── index.ts               # Block registry
+├── utils/
+│   └── defineDatadogBlock.ts  # Block abstraction utility
+├── schemas/                   # JSON schemas for validation
+│   ├── monitor.ts
+│   └── event.ts
+├── main.ts                    # App definition
+└── package.json               # Dependencies and scripts
 ```
 
-## Repository Setup
+### Adding New Blocks
 
-### 1. Branch Protection (Recommended)
+1. **Define the block** using the abstraction:
 
-Configure branch protection for `main`:
+```typescript
+// blocks/monitors/MyNewBlock.ts
+import { defineDatadogBlock } from "../../utils/defineDatadogBlock";
+import { monitorId } from "../shared";
 
-- Require pull request reviews
-- Require status checks (CI)
-- Allow GitHub Actions bot to bypass (for version registry updates)
-
-### 2. Repository Settings
-
-- Enable "Template repository" if this will be reused
-- Configure secrets if needed for external services
-- Set up branch protection rules
-
-## Deployment
-
-### Creating Releases
-
-1. **Ensure main is clean**: All changes merged and CI passing
-2. **Create and push tag**:
-
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-
-3. **Automated process**: CI creates release and updates registry
-4. **Verify**: Check GitHub releases and `versions.json` in main
-
-### Versioning
-
-Follow [Semantic Versioning](https://semver.org/):
-
-- `v1.0.0` - Major release (breaking changes)
-- `v1.1.0` - Minor release (new features)
-- `v1.0.1` - Patch release (bug fixes)
-
-## Best Practices
-
-### Code Organization
-
-- Keep `main.ts` focused on app definition
-- Use `types.ts` for all TypeScript definitions
-- Document your blocks and configuration clearly
-
-### Error Handling
-
-- Let errors bubble up naturally - don't catch and wrap them
-- Use descriptive error messages
-- The framework will handle error catching and reporting
-
-### Security
-
-- Mark sensitive config fields as `secret: true`
-- Never log API keys or sensitive data
-- Validate all inputs
-
-### Testing
-
-- Test your blocks manually before releasing
-- Verify configuration schema works as expected
-- Test the complete deployment pipeline
-
-## Troubleshooting
-
-### Common Issues
-
-**CI fails on format check**
-
-```bash
-npm run format
-git add .
-git commit -m "Fix formatting"
+export const myNewBlock = defineDatadogBlock({
+  name: "My New Action",
+  description: "Description of what it does",
+  category: "Monitors",
+  method: "GET",
+  endpoint: "/api/v1/monitor/{monitor_id}/action",
+  pathParams: ["monitor_id"],
+  inputConfig: {
+    monitor_id: monitorId,
+    // ... other inputs
+  },
+});
 ```
 
-**Bundle creation fails**
+2. **Register the block** in `blocks/index.ts`:
 
-- Check TypeScript errors: `npm run typecheck`
-- Verify all imports are correct
-- Ensure `main.ts` exports default app
+```typescript
+import { myNewBlock } from "./monitors/MyNewBlock";
 
-**Release creation fails**
+export const blocks = {
+  // ... existing blocks
+  myNew: myNewBlock,
+} as const;
+```
 
-- Verify branch protection allows GitHub Actions bot
-- Check repository permissions
-- Ensure tag follows semver format (v1.0.0)
+### Block Implementation Pattern
 
-**Version registry not updating**
+The `defineDatadogBlock` utility handles:
+- HTTP request construction
+- Authentication headers (DD-API-KEY, DD-APPLICATION-KEY)
+- Path parameter substitution
+- Query parameter building for GET requests
+- Request body building for POST/PUT requests
+- Error handling and response processing
+- Type-safe input/output handling
 
-- Check GitHub Actions bot has push access to main
-- Verify workflow permissions in repository settings
-- Check for conflicts in versions.json
+## API Coverage
 
-## Template Checklist
+### Monitor API (V1)
+- `POST /api/v1/monitor` - Create monitor
+- `GET /api/v1/monitor/{id}` - Get monitor
+- `PUT /api/v1/monitor/{id}` - Update monitor
+- `DELETE /api/v1/monitor/{id}` - Delete monitor
+- `GET /api/v1/monitor` - List monitors
+- `POST /api/v1/monitor/{id}/mute` - Mute monitor
+- `POST /api/v1/monitor/{id}/unmute` - Unmute monitor
 
-When creating a new app from this template:
+### Events API (V2)
+- `POST /api/v2/events` - Create event
+- `GET /api/v2/events/{id}` - Get event
+- `GET /api/v2/events` - List events
+- `POST /api/v2/events/search` - Search events
 
-- [ ] Run `npm install && npm run setup` for automated setup
-- [ ] Customize app configuration schema in `main.ts`
-- [ ] Implement your block logic in `blocks/`
-- [ ] Update block names, descriptions, and categories
-- [ ] Define proper input/output schemas
-- [ ] Test locally with `npm run typecheck` and `npm run bundle`
-- [ ] Update this README with app-specific information
-- [ ] Set up repository branch protection
-- [ ] Create first release with `git tag v1.0.0`
+## Security
 
----
+- API keys are marked as sensitive and encrypted
+- No sensitive data is logged
+- All inputs are validated against JSON schemas
+- Secure HTTP headers are used for API requests
 
-**Template Version**: 1.0.0
+## Support
+
+For issues or feature requests, please check the DataDog API documentation:
+- [DataDog API Reference](https://docs.datadoghq.com/api/)
+- [Monitor API](https://docs.datadoghq.com/api/latest/monitors/)
+- [Events API](https://docs.datadoghq.com/api/latest/events/)

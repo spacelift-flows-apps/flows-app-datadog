@@ -1,5 +1,5 @@
 import { defineDatadogBlock } from "../../utils/defineDatadogBlock";
-import { name, tags, pageSize } from "../shared";
+import { name, tags, pageSize, page } from "../shared";
 import { withDowntimes, groupStates } from "./shared";
 import { monitorListSchema } from "../../schemas/monitor";
 
@@ -22,5 +22,6 @@ export const listMonitorsV1 = defineDatadogBlock({
     with_downtimes: withDowntimes,
     group_states: groupStates,
     page_size: pageSize,
+    page,
   },
 });
