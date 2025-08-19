@@ -1,4 +1,4 @@
-import {AppBlock, EventInput, events} from "@slflows/sdk/v1";
+import {AppBlock, events} from "@slflows/sdk/v1";
 
 export const subscribeToMonitorV1: AppBlock = {
     name: "Subscribe to Monitor",
@@ -13,16 +13,10 @@ export const subscribeToMonitorV1: AppBlock = {
             required: false,
         },
     },
-    async onInternalMessage({ app, block, message }) {
+    async onInternalMessage({ message }) {
         const monitorPayload = message.body;
 
         await events.emit(monitorPayload);
-        // } else {
-        //     console.warn(
-        //         "messagesSubscription received unexpected internal message:",
-        //         slackEvent,
-        //     );
-        // }
     },
 
     outputs: {

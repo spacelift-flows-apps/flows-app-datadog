@@ -1,4 +1,4 @@
-import {AppInput,http, defineApp,blocks,messaging} from "@slflows/sdk/v1";
+import {AppInput, http, defineApp, blocks, messaging, kv} from "@slflows/sdk/v1";
 import { blocks as allBlocks } from "./blocks/index";
 
 export const app = defineApp({
@@ -15,12 +15,6 @@ export const app = defineApp({
       type: "string",
       required: true,
       sensitive: true,
-    },
-    webhookSecret: {
-      name: "Datadog Webhook Secret",
-      description: "Secret key for validating Datadog webhook requests",
-      type: "string",
-      required: true,
     },
     appKey: {
       name: "Application Key",
@@ -76,6 +70,23 @@ export const app = defineApp({
         };
       }
 
+      // Check if webhook already exists
+      const existingWebhookName = await kv.app.get("webhook_name");
+      
+      if (existingWebhookName?.value) {
+        console.log(`Webhook already exists: ${existingWebhookName.value}`);
+        return {
+          newStatus: "ready" as const,
+        };
+      }
+
+      // Generate and store webhook secret
+      const webhookSecret = crypto.randomUUID();
+      await kv.app.set({ key: "webhook_secret", value: webhookSecret });
+
+      // Generate unique webhook name
+      const webhookName = `spacelift-flows-${crypto.randomUUID()}`;
+
       try {
         const webhookResponse = await fetch(`${baseUrl}/api/v1/integration/webhooks/configuration/webhooks`, {
           method: "POST",
@@ -84,8 +95,8 @@ export const app = defineApp({
             "DD-APPLICATION-KEY": appKey,
           },
           body: JSON.stringify({
-            name: `spacelift-flows-${crypto.randomUUID()}`,
-            url: `${input.app.http.url}/webhook`,
+            name: webhookName,
+            url: `${input.app.http.url}/webhook?secret=${webhookSecret}`,
             payload: `{
               "monitor_id": "$ALERT_ID",
               "monitor_name": "$ALERT_TITLE",
@@ -115,6 +126,10 @@ export const app = defineApp({
         } else {
           const webhookResult = await webhookResponse.json();
           console.log(`Webhook created successfully with ID: ${webhookResult.id || 'unknown'}`);
+          
+          // Store webhook name in KV for future reference
+          await kv.app.set({ key: "webhook_name", value: webhookName });
+          console.log(`Stored webhook name: ${webhookName}`);
         }
       } catch (webhookError) {
         const errorMsg = `Failed to create webhook: ${webhookError instanceof Error ? webhookError.message : String(webhookError)}`;
@@ -143,20 +158,20 @@ export const app = defineApp({
       // Handle DataDog webhook events
       console.log("Received webhook from Datadog");
 
-      // Validate the request
-      // Check if the webhook secret is in the query parameters
-      // const requestedSecret = input.request.query.secret;
-      // if (
-      //     input.app.config.webhookSecret &&
-      //     (!requestedSecret || requestedSecret !== input.app.config.webhookSecret)
-      // ) {
-      //   console.log("Invalid webhook secret");
-      //   await http.respond(input.request.requestId, {
-      //     statusCode: 401,
-      //     body: { error: "Unauthorized: Invalid webhook secret" },
-      //   });
-      //   return;
-      // }
+      // Validate the webhook secret from query parameters
+      const requestedSecret = input.request.query?.secret;
+      const storedSecretPair = await kv.app.get("webhook_secret");
+      const storedSecret = storedSecretPair?.value;
+      
+      if (!requestedSecret || !storedSecret || requestedSecret !== storedSecret) {
+        console.log("Invalid webhook secret. Requested:", requestedSecret, "Stored:", storedSecret);
+        await http.respond(input.request.requestId, {
+          statusCode: 401,
+          body: { error: "Unauthorized: Invalid webhook secret" },
+        });
+        return;
+      }
+
 
       // Optional: Also check if the path is correct (e.g., /webhook)
       if (input.request.path && !input.request.path.includes("/webhook")) {
