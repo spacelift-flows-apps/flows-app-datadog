@@ -70,6 +70,8 @@ This app automatically sets up webhook integration with DataDog for real-time mo
 
 The **Subscribe to Monitor** block allows you to listen for real-time monitor alerts.
 
+To receive alerts, you must configure your DataDog monitors to send notifications to the webhook. In your monitor's notification settings, add the webhook name (created by this app) to the notification list.
+
 ## Support
 
 For issues or feature requests, please check the DataDog API documentation:
