@@ -1,4 +1,4 @@
-# DataDog API Flows App
+# DataDog Flows App
 
 A Flows app that provides integration with DataDog's monitoring and events APIs, allowing you to manage monitors and events directly from your flows.
 
@@ -15,6 +15,7 @@ This app provides blocks for:
 - **List Monitors** - Query and list monitors with filters
 - **Mute Monitor** - Temporarily mute monitor notifications
 - **Unmute Monitor** - Restore monitor notifications
+- **Subscribe to Monitor** - Listen for real-time monitor alerts and status changes via webhooks
 
 ### Event Management
 
@@ -30,7 +31,8 @@ This app provides blocks for:
    - DataDog API Key (required)
    - DataDog Application Key (required)
    - Base URL (defaults to https://api.datadoghq.com)
-3. **Add blocks to your flows** and configure inputs
+3. **App automatically creates a webhook** in DataDog for real-time monitor alerts
+4. **Add blocks to your flows** and configure inputs
 
 ## Configuration
 
@@ -52,6 +54,23 @@ All monitor-related operations for creating, managing, and controlling DataDog m
 ### Events
 
 Event creation and querying capabilities for DataDog's events system.
+
+## Webhook Integration
+
+This app automatically sets up webhook integration with DataDog for real-time monitoring:
+
+### Automatic Webhook Setup
+
+- **On Installation**: The app creates a unique webhook in your DataDog account
+- **Secure Authentication**: Uses a randomly generated secret for webhook validation
+- **Real-time Alerts**: Receives monitor status changes instantly via webhooks
+- **Automatic Cleanup**: Webhook is removed when the app is uninstalled
+
+### Subscribe to Monitor Block
+
+The **Subscribe to Monitor** block allows you to listen for real-time monitor alerts.
+
+To receive alerts, you must configure your DataDog monitors to send notifications to the webhook. In your monitor's notification settings, add the webhook name (created by this app) to the notification list.
 
 ## Support
 
